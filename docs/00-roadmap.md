@@ -1,177 +1,127 @@
 # Roadmap — Architecte Solution Azure
 
-## But
+## Statut global
 
-Construire progressivement une plateforme bancaire fictive Azure suffisamment réaliste pour travailler les décisions attendues d'un Architecte Solution : exigences, gouvernance, sécurité, réseau, applicatif, intégration, data, exploitation, continuité, coût et IA.
+**Conception des itérations 0 à 13 : terminée.**
 
-## Definition of Done commune
+Le dépôt distingue deux états :
+- `✅ conception` : architecture, décisions, alternatives, risques, lab et critères sont documentés ;
+- `🧪 exécution` : le lab doit encore être exécuté sur un abonnement Azure et fournir ses preuves.
 
-Une itération est terminée uniquement si elle contient :
+## Definition of Done
 
-- exigences et hypothèses ;
-- diagramme d'architecture ;
-- alternatives étudiées ;
-- ADR pour les choix structurants ;
-- code IaC ou justification si le service n'est pas déployé ;
-- commandes de validation ;
-- tests positifs et négatifs ;
-- estimation/coût observé ;
-- procédure de destruction ;
+Une itération de **conception** doit contenir :
+- exigences/hypothèses ;
+- architecture ;
+- décisions/alternatives ;
+- ADR ou entrée au catalogue ;
+- IaC ou justification explicite lorsque le service coûteux n'est déployé qu'à la demande ;
+- validation positive/négative ;
+- coût/risque ;
+- destroy ;
 - questions de soutenance.
 
-## Itération 0 — Fondations ✅
+Un lab n'est **exécuté** qu'après conservation des sorties de test et confirmation du destroy.
 
-- contexte MayaBank ;
-- principes d'architecture ;
-- NFR initiaux ;
-- structure documentaire ;
-- template ADR ;
-- stratégie Terraform/Bicep ;
-- stratégie de labs et coûts.
+## Parcours
 
-## Itération 1 — Azure Landing Zone ✅
+| # | Itération | Conception | Exécution |
+|---:|---|---|---|
+| 0 | Fondations | ✅ | ✅ |
+| 1 | Azure Landing Zone | ✅ | code Terraform prêt |
+| 2 | Identity & Security | ✅ | code Terraform prêt |
+| 3 | Network Foundation | ✅ | code Terraform prêt |
+| 4 | AKS | ✅ | 🧪 à la demande |
+| 5 | API Management | ✅ | 🧪 à la demande |
+| 6 | Event Driven Architecture | ✅ | 🧪 à la demande |
+| 7 | Data | ✅ | code Terraform prêt |
+| 8 | Observability | ✅ | code Terraform prêt |
+| 9 | HA / DR | ✅ | 🧪 exercices à exécuter |
+| 10 | FinOps / GreenOps | ✅ | 🧪 routine à exécuter |
+| 11 | Microsoft Foundry / AI | ✅ | 🧪 selon quota/modèle |
+| 12 | Migration | ✅ | 🧪 pilote OpenShift -> AKS |
+| 13 | Soutenance | ✅ | scénario prêt |
 
-### Réalisé
-- Platform Landing Zone vs Application Landing Zones ;
-- hiérarchie Management Groups ;
-- modèle de subscriptions entreprise ;
-- variante single-subscription pour le lab ;
-- Azure Policy baseline ;
-- naming/tagging standard ;
-- ADR de gouvernance ;
-- cible Terraform + Azure Verified Modules ;
-- LAB 01 Policy as Code avec validation et destruction.
+## 0 — Fondations ✅
 
-### Lab
-`labs/lab-01-landing-zone`
+Contexte MayaBank, NFR, principes, structure documentaire, ADR template, stratégie IaC et stratégie de labs.
 
-## Itération 2 — Identity & Security
+## 1 — Azure Landing Zone ✅
 
-- Entra ID ;
-- RBAC ;
-- PIM ;
-- Managed Identities ;
-- workload identity ;
-- Key Vault ;
-- Defender for Cloud ;
-- séparation des responsabilités.
+Platform/Application Landing Zones, Management Groups, subscriptions, Azure Policy, naming/tagging, AVM Terraform et LAB 01.
 
-## Itération 3 — Network Foundation
+## 2 — Identity & Security ✅
 
-- Hub-Spoke ;
-- Azure Firewall ;
-- Private DNS ;
-- Private Link / Private Endpoints ;
-- NAT Gateway ;
-- Application Gateway / Front Door ;
-- ExpressRoute et VPN ;
-- flux inter-zones et inter-régions.
+Entra ID, groupes, Azure RBAC, PIM/JIT, Managed Identities, Workload Identity, Key Vault, Defender for Cloud et séparation des responsabilités.
 
-## Itération 4 — AKS
+Lab : `labs/lab-02-identity`.
 
-- cluster privé ;
-- node pools ;
-- zones de disponibilité ;
-- CNI ;
-- ingress ;
-- Key Vault CSI ;
-- autoscaling ;
-- quotas/limits ;
-- network policies ;
-- ACR ;
-- GitOps.
+## 3 — Network Foundation ✅
 
-## Itération 5 — API Management
+Hub-Spoke, Firewall cible, Private DNS, Private Link, Application Gateway/Front Door, ExpressRoute/VPN et plan IP.
 
-- API gateway ;
-- produits/subscriptions ;
-- OAuth2/OIDC ;
-- rate limiting ;
-- JWT validation ;
-- transformation ;
-- private networking ;
-- diagnostics ;
-- versioning.
+Lab : `labs/lab-03-network`.
 
-## Itération 6 — Event Driven Architecture
+## 4 — AKS ✅
 
-- Service Bus pour messaging métier fiable ;
-- Event Hubs pour streaming à fort débit ;
-- Event Grid pour distribution d'événements ;
-- idempotence ;
-- retry ;
-- dead-letter ;
-- outbox ;
-- traçabilité.
+AKS Standard baseline, cluster privé, node pools, Workload Identity, CNI, ingress, PDB, autoscaling, network policy, ACR, observabilité et multi-région.
 
-## Itération 7 — Data
+Lab : `labs/lab-04-aks`.
 
-- Azure SQL / PostgreSQL ;
-- Cosmos DB ;
-- Storage Account ;
-- Data Lake ;
-- chiffrement ;
-- sauvegarde ;
-- private endpoints ;
-- classification des données.
+## 5 — API Management ✅
 
-## Itération 8 — Observability
+APIM Premium v2 cible isolée, OAuth/OIDC, JWT, mTLS, rate limiting, policies, versioning, Private networking et diagnostics.
 
-- Azure Monitor ;
-- Log Analytics ;
-- Application Insights ;
-- OpenTelemetry ;
-- SLI/SLO ;
-- dashboards ;
-- alertes ;
-- corrélation distribuée.
+Lab : `labs/lab-05-apim`.
 
-## Itération 9 — HA / DR
+## 6 — Event Driven Architecture ✅
 
-- Availability Zones ;
-- architecture multi-région ;
-- RTO/RPO par service ;
-- sauvegarde/restauration ;
-- runbooks ;
-- exercices de reprise ;
-- chaos/resilience tests.
+Service Bus, Event Hubs, Event Grid, Outbox, idempotence, retry, DLQ, schema versioning, replay et corrélation.
 
-## Itération 10 — FinOps / GreenOps
+Lab : `labs/lab-06-event-driven`.
 
-- tagging économique ;
-- budgets/alerts ;
-- rightsizing ;
-- autoscaling ;
-- réservations/savings plans selon contexte ;
-- arrêt automatique des environnements de lab ;
-- mesure coût par workload ;
-- arbitrage performance/coût/empreinte.
+## 7 — Data ✅
 
-## Itération 11 — AI Platform
+Azure SQL/PostgreSQL/Cosmos/Storage selon besoin, classification, chiffrement, backup/restore, Private Endpoint, lifecycle et cohérence.
 
-- Azure AI Foundry ;
-- Azure OpenAI ;
-- Azure AI Search ;
-- RAG ;
-- identité managée ;
-- réseau privé ;
-- sécurité des données ;
-- évaluation et observabilité IA ;
-- gouvernance et Responsible AI.
+Lab : `labs/lab-07-data`.
 
-## Itération 12 — Migration
+## 8 — Observability ✅
 
-Cas fil rouge : migration progressive d'un SI bancaire on-prem/OpenShift vers Azure.
+Azure Monitor, Log Analytics, Application Insights, OpenTelemetry, SLI/SLO, KQL, alertes, corrélation, rétention et coût.
 
-- assessment ;
-- dépendances ;
-- 6R/7R ;
-- coexistence hybride ;
-- migration data ;
-- cutover ;
-- rollback ;
-- décommissionnement.
+Lab : `labs/lab-08-observability`.
 
-## Itération 13 — Soutenance architecte
+## 9 — HA / DR ✅
 
-Livrer un dossier complet : contexte, exigences, HLD, sécurité, réseau, résilience, exploitation, coûts, risques, ADR et trajectoire.
+Zones, régions, RTO/RPO, backup/restore, failover/failback, runbooks et exercices chronométrés.
+
+Lab : `labs/lab-09-ha-dr`.
+
+## 10 — FinOps / GreenOps ✅
+
+Tags, budgets, rightsizing, scaling, ressources orphelines, rétention et leviers de sobriété mesurables.
+
+Lab : `labs/lab-10-finops-greenops`.
+
+## 11 — Microsoft Foundry / AI ✅
+
+Microsoft Foundry, Azure OpenAI/Models, AI Search, RAG, authz documentaire, sécurité, évaluation, observabilité IA et AI Gateway.
+
+Lab : `labs/lab-11-ai`.
+
+## 12 — Migration ✅
+
+Assessment, 7R, dépendances, coexistence hybride, migration par vagues, cutover, rollback et décommissionnement.
+
+Lab : `labs/lab-12-migration`.
+
+## 13 — Soutenance Architecte ✅
+
+Dossier d'architecture, synthèse HLD, 15 décisions structurantes, risques, questions d'entretien et challenge 30+30 minutes.
+
+Lab : `labs/lab-13-soutenance`.
+
+## Phase suivante — preuves terrain
+
+Exécuter les labs progressivement, renseigner les résultats, mesurer le coût, conserver les erreurs et faire évoluer les ADR. La valeur pédagogique vient désormais de la **preuve par exécution**, pas de l'ajout de nouvelles pages théoriques.
