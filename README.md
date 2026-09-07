@@ -1,142 +1,134 @@
 # MayaBank Azure Cloud & AI Platform
 
-> Projet fil rouge d'architecture solution Azure pour une banque fictive : Landing Zone, identité, réseau, sécurité, AKS, API Management, intégration événementielle, data, observabilité, résilience, FinOps/GreenOps et IA.
+> Projet fil rouge **Architecte Solution Azure** pour une banque fictive : Landing Zone, identité, réseau, sécurité, AKS, API Management, event-driven, data, observabilité, résilience, FinOps/GreenOps, Microsoft Foundry et migration hybride.
 
 ## Objectif
 
-Ce dépôt sert à apprendre et démontrer le travail d'un **Architecte Solution Azure** de bout en bout : partir d'exigences métier et non fonctionnelles, définir une architecture cible, justifier les choix, automatiser l'infrastructure, déployer des POC, tester la résilience/sécurité et documenter les décisions.
+Ce dépôt démontre le travail d'un Architecte Solution Azure de bout en bout :
 
-Il ne s'agit pas d'un simple dépôt de préparation à une certification. Chaque domaine doit produire :
+`Besoin métier -> NFR -> principes -> Landing Zone -> sécurité -> réseau -> compute -> intégration -> data -> observabilité -> résilience -> coût -> IA -> migration -> soutenance`
 
-1. un besoin et des exigences ;
-2. une architecture et ses alternatives ;
-3. des ADR ;
-4. de l'IaC reproductible ;
-5. un lab exécutable ;
-6. des contrôles de validation ;
-7. une procédure de destruction pour maîtriser les coûts.
+Il ne s'agit pas seulement d'une préparation à AZ-305. Chaque décision importante doit être reliée à des exigences, alternatives, risques, ADR, IaC/lab et critères de validation.
 
-## Architecture cible — vue logique
+## Architecture cible — synthèse
 
 ```mermaid
 flowchart TB
-    U[Clients / Partenaires / Applications] --> FD[Azure Front Door + WAF]
-    FD --> APIM[Azure API Management]
-    APIM --> AKS[AKS - Workloads métiers]
-    APIM --> FUNC[Azure Functions / Container Apps]
+  USERS[Clients / partenaires / employés] --> AFD[Azure Front Door + WAF]
+  AFD --> APIM[API Management - Premium v2 cible isolée]
+  APIM --> AKS[AKS Standard - workloads métiers]
+  APIM --> PAAS[Functions / Container Apps selon workload]
 
-    AKS --> SB[Azure Service Bus]
-    AKS --> EH[Azure Event Hubs]
-    AKS --> SQL[Azure SQL / PostgreSQL]
-    AKS --> COSMOS[Cosmos DB]
-    AKS --> STG[Storage / Data Lake]
+  AKS --> SB[Azure Service Bus]
+  AKS --> EH[Azure Event Hubs]
+  AKS --> DB[Azure SQL / PostgreSQL / Cosmos DB selon besoin]
+  AKS --> STG[Blob / Data Lake]
+  EH --> DATA[Analytics]
+  STG --> DATA
+  DATA --> AI[Microsoft Foundry / AI Search / Models]
 
-    EH --> DATA[Data & Analytics]
-    DATA --> AI[Azure AI Platform]
+  ENTRA[Microsoft Entra ID / PIM / RBAC] -. identité .-> APIM
+  ENTRA -. identité .-> AKS
+  KV[Key Vault + Managed/Workload Identity] -. secrets/certificats .-> AKS
 
-    ENTRA[Microsoft Entra ID] -. identité .-> APIM
-    ENTRA -. identité .-> AKS
-    KV[Azure Key Vault] -. secrets/certificats .-> APIM
-    KV -. secrets/certificats .-> AKS
+  HUB[Hub-Spoke / Firewall / Private DNS / ER-VPN] --- APIM
+  HUB --- AKS
+  HUB --- DB
 
-    MON[Azure Monitor / Log Analytics / App Insights] -. observabilité .-> APIM
-    MON -. observabilité .-> AKS
+  MON[Azure Monitor / Log Analytics / App Insights / OpenTelemetry] -. observabilité .-> APIM
+  MON -. observabilité .-> AKS
 
-    HUB[Connectivity Hub\nFirewall / DNS / Bastion / ER-VPN] --- APIM
-    HUB --- AKS
+  DR[Zones / second region / backup / runbooks] --- AKS
+  DR --- DB
 ```
 
-Cette vue évoluera au fil des ADR et des labs. Elle n'est pas une architecture finale figée.
+## État du parcours
 
-## Structure du dépôt
+| Itération | Domaine | Conception | Lab/code |
+|---|---|---|---|
+| 0 | Fondations | ✅ | ✅ |
+| 1 | Azure Landing Zone | ✅ | ✅ Terraform Policy/ALZ |
+| 2 | Identity & Security | ✅ | ✅ Terraform lab faible coût |
+| 3 | Networking | ✅ | ✅ Terraform Hub-Spoke lab |
+| 4 | AKS | ✅ | 🧪 lab à exécuter à la demande |
+| 5 | API Management | ✅ | 🧪 lab à exécuter à la demande |
+| 6 | Event-driven | ✅ | 🧪 scénario retry/DLQ/idempotence prêt |
+| 7 | Data | ✅ | ✅ Terraform Storage lab |
+| 8 | Observability | ✅ | ✅ Terraform Log Analytics lab |
+| 9 | HA / DR | ✅ | 🧪 exercices/runbook prêts |
+| 10 | FinOps / GreenOps | ✅ | 🧪 routine de contrôle prête |
+| 11 | Microsoft Foundry / AI | ✅ | 🧪 RAG lab selon quota |
+| 12 | Migration OpenShift -> Azure | ✅ | 🧪 scénario pilote prêt |
+| 13 | Soutenance Architecte | ✅ | ✅ challenge 30+30 min prêt |
+
+**Les itérations 0 à 13 sont terminées au niveau conception.** Les labs Azure nécessitant un abonnement authentifié ne sont volontairement pas marqués comme exécutés tant qu'aucun `apply` et aucune preuve de test n'ont été produits.
+
+## Documentation
 
 ```text
-mayabank-azure-cloud-ai-platform/
-├── docs/
-│   ├── 00-roadmap.md
-│   ├── 01-business-context/
-│   ├── 02-architecture-principles/
-│   ├── 03-azure-landing-zone/
-│   ├── 04-identity-entra/
-│   ├── 05-networking/
-│   ├── 06-security/
-│   ├── 07-aks/
-│   ├── 08-api-management/
-│   ├── 09-event-driven/
-│   ├── 10-data/
-│   ├── 11-observability/
-│   ├── 12-ha-dr/
-│   ├── 13-finops-greenops/
-│   ├── 14-ai-platform/
-│   └── 15-architecture-decisions/
-├── architecture/
-│   ├── diagrams/
-│   └── adr/
-├── infrastructure/
-│   ├── terraform/
-│   └── bicep/
-├── platform/
-│   ├── aks/
-│   ├── apim/
-│   ├── event-hubs/
-│   ├── service-bus/
-│   └── ai/
-├── security/
-├── observability/
-├── labs/
-├── cost/
-└── interview/
+docs/
+├── 00-roadmap.md
+├── 01-business-context/
+├── 02-architecture-principles/
+├── 03-azure-landing-zone/
+├── 04-identity-entra/
+├── 05-networking/
+├── 07-aks/
+├── 08-api-management/
+├── 09-event-driven/
+├── 10-data/
+├── 11-observability/
+├── 12-ha-dr/
+├── 13-finops-greenops/
+├── 14-ai-platform/
+├── 15-migration/
+└── 16-soutenance/
 ```
 
-## Parcours
+Les décisions structurantes sont centralisées dans `architecture/adr/ADR-CATALOG.md`.
 
-| Itération | Sujet | Livrable principal |
-|---|---|---|
-| 0 ✅ | Fondations | contexte, principes, roadmap, ADR, structure |
-| 1 ✅ | Azure Landing Zone | management groups, subscriptions, policies, tagging, AVM, lab |
-| 2 | Identity & Security | Entra ID, RBAC, PIM, Managed Identities, Key Vault |
-| 3 | Networking | Hub-Spoke, Firewall, DNS privé, Private Endpoints, ER/VPN |
-| 4 | AKS | cluster privé, ingress, identité, storage, autoscaling |
-| 5 | API Management | exposition d'API, policies, sécurité, private networking |
-| 6 | Event-driven | Service Bus, Event Hubs, patterns d'intégration |
-| 7 | Data | Azure SQL/PostgreSQL, Cosmos DB, Storage/Data Lake |
-| 8 | Observability | Monitor, Log Analytics, Application Insights, alerting |
-| 9 | HA/DR | zones, régions, backup, RTO/RPO, exercices de reprise |
-| 10 | FinOps/GreenOps | budgets, tagging, sizing, arrêt/destruction, optimisation |
-| 11 | AI Platform | Azure AI, AI Search, RAG, sécurité et gouvernance IA |
-| 12 | Migration | trajectoire on-prem/OpenShift vers Azure |
-| 13 | Soutenance | dossier d'architecture + questions d'entretien |
+## Labs
 
-## Principes de travail
+Le catalogue complet est dans `labs/LAB-CATALOG.md`.
 
-- **Architecture avant technologie** : besoin, contraintes et NFR avant choix de services.
-- **Private by default** : accès privé dès que pertinent ; exposition publique explicitement justifiée.
-- **Zero Trust** : vérification explicite, moindre privilège, identité de workload.
-- **Everything as Code** : Terraform prioritaire ; Bicep conservé pour comparaison et compréhension Azure native.
-- **Policy as Code** : gouvernance contrôlée et versionnée.
-- **Observability by design** : logs, métriques, traces, SLO et alertes conçus avec le workload.
-- **Resilience by design** : RTO/RPO et modes dégradés définis avant la production.
-- **FinOps/GreenOps by design** : coût et consommation évalués avant chaque déploiement.
-- **Destroyable labs** : aucun lab ne doit laisser des ressources coûteuses sans procédure de destruction.
+Terraform déjà fourni pour les labs les moins coûteux :
+
+- `lab-01-landing-zone` — Azure Policy / gouvernance ;
+- `lab-02-identity` — Managed Identity + Key Vault + RBAC ;
+- `lab-03-network` — Hub-Spoke + NSG + Private DNS ;
+- `lab-07-data` — Storage security baseline ;
+- `lab-08-observability` — Log Analytics baseline.
+
+AKS, APIM Premium v2, multi-région et Microsoft Foundry sont créés uniquement pendant les sessions qui les nécessitent afin d'éviter une facture permanente.
+
+## Principes
+
+- Architecture avant technologie.
+- Azure Well-Architected Framework : Reliability, Security, Cost Optimization, Operational Excellence, Performance Efficiency.
+- Private by default pour les données/services sensibles.
+- Zero Trust et least privilege.
+- Managed Identity / Workload Identity avant secrets statiques.
+- Terraform + Azure Verified Modules prioritaire.
+- Policy as Code.
+- Observability by design avec OpenTelemetry.
+- RTO/RPO métier avant design DR.
+- FinOps/GreenOps by design.
+- Labs reproductibles, vérifiables et destructibles.
 
 ## Références principales
 
-Les implémentations s'inspireront des références Microsoft actuelles sans les recopier aveuglément :
+- `Azure/Azure-Landing-Zones`
+- `MicrosoftDocs/architecture-center`
+- `Azure/terraform-azurerm-avm-ptn-alz`
+- `Azure-Samples/azure-hub-spoke`
+- `Azure/AKS-Landing-Zone-Accelerator`
+- `Azure/apim-landing-zone-accelerator`
+- `Azure/AI-Landing-Zones`
 
-- Azure Landing Zones — `Azure/Azure-Landing-Zones`
-- Azure Architecture Center — `MicrosoftDocs/architecture-center`
-- AVM Platform Landing Zone Terraform — `Azure/terraform-azurerm-avm-ptn-alz`
-- Hub-Spoke — `Azure-Samples/azure-hub-spoke`
-- AKS Landing Zone Accelerator — `Azure/AKS-Landing-Zone-Accelerator`
-- API Management Landing Zone Accelerator — `Azure/apim-landing-zone-accelerator`
-- AI Landing Zones — `Azure/AI-Landing-Zones`
+## Budget pédagogique
 
-## Budget de lab
+Le dépôt sépare **cible entreprise** et **lab économique**. Azure Firewall, Bastion, APIM Premium v2, AKS multi-zone/multi-région, grosses bases et plateformes IA ne doivent pas rester déployés pour un exercice ponctuel.
 
-Le projet doit rester compatible avec un **petit budget Azure**. Les composants coûteux seront soit déployés à la demande, soit simulés, soit documentés sans exécution permanente. Chaque lab comportera une section `destroy` et un contrôle du coût attendu.
+## Suite pratique
 
-## État
-
-**Itérations 0 et 1 — terminées.**
-
-Prochaine étape : **Itération 2 — Identity & Security**, avec Microsoft Entra ID, groupes, RBAC, PIM, Managed Identities, Workload Identity, Key Vault, séparation des responsabilités et contrôles de moindre privilège.
+La phase suivante n'est plus d'ajouter des chapitres : elle consiste à **exécuter les labs dans l'ordre**, conserver les preuves, mesurer les coûts et corriger l'architecture à partir des résultats observés.
