@@ -92,8 +92,8 @@ mayabank-azure-cloud-ai-platform/
 
 | Itération | Sujet | Livrable principal |
 |---|---|---|
-| 0 | Fondations | contexte, principes, roadmap, ADR, structure |
-| 1 | Azure Landing Zone | management groups, subscriptions, policies, tagging |
+| 0 ✅ | Fondations | contexte, principes, roadmap, ADR, structure |
+| 1 ✅ | Azure Landing Zone | management groups, subscriptions, policies, tagging, AVM, lab |
 | 2 | Identity & Security | Entra ID, RBAC, PIM, Managed Identities, Key Vault |
 | 3 | Networking | Hub-Spoke, Firewall, DNS privé, Private Endpoints, ER/VPN |
 | 4 | AKS | cluster privé, ingress, identité, storage, autoscaling |
@@ -137,6 +137,6 @@ Le projet doit rester compatible avec un **petit budget Azure**. Les composants 
 
 ## État
 
-**Itération 0 — terminée.**
+**Itérations 0 et 1 — terminées.**
 
-Prochaine étape : **Itération 1 — Azure Landing Zone**, avec management groups, subscriptions, Azure Policy, tagging, budgets et première implémentation Terraform/AVM.
+Prochaine étape : **Itération 2 — Identity & Security**, avec Microsoft Entra ID, groupes, RBAC, PIM, Managed Identities, Workload Identity, Key Vault, séparation des responsabilités et contrôles de moindre privilège.
