@@ -19,7 +19,7 @@ Une itération est terminée uniquement si elle contient :
 - procédure de destruction ;
 - questions de soutenance.
 
-## Itération 0 — Fondations
+## Itération 0 — Fondations ✅
 
 - contexte MayaBank ;
 - principes d'architecture ;
@@ -29,19 +29,21 @@ Une itération est terminée uniquement si elle contient :
 - stratégie Terraform/Bicep ;
 - stratégie de labs et coûts.
 
-## Itération 1 — Azure Landing Zone
+## Itération 1 — Azure Landing Zone ✅
 
-### À apprendre
-- Tenant, Management Groups, Subscriptions, Resource Groups ;
-- séparation plateforme/workloads ;
-- Azure Policy et initiatives ;
-- tagging ;
-- budgets ;
-- diagnostics ;
-- Azure Verified Modules.
+### Réalisé
+- Platform Landing Zone vs Application Landing Zones ;
+- hiérarchie Management Groups ;
+- modèle de subscriptions entreprise ;
+- variante single-subscription pour le lab ;
+- Azure Policy baseline ;
+- naming/tagging standard ;
+- ADR de gouvernance ;
+- cible Terraform + Azure Verified Modules ;
+- LAB 01 Policy as Code avec validation et destruction.
 
 ### Lab
-Déployer une ALZ simplifiée adaptée au budget de formation, sans chercher à reproduire toute une banque réelle.
+`labs/lab-01-landing-zone`
 
 ## Itération 2 — Identity & Security
 
