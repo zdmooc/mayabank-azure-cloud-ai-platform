@@ -8,6 +8,8 @@ crash.*.log
 !*.tfvars.example
 .terraformrc
 terraform.rc
+.alzlib/
+**/.alzlib/
 
 # Azure / credentials
 .azure/
