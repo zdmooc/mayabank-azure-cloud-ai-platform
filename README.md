@@ -137,4 +137,6 @@ Le projet doit rester compatible avec un **petit budget Azure**. Les composants 
 
 ## État
 
-**Itération 0 — en construction.**
+**Itération 0 — terminée.**
+
+Prochaine étape : **Itération 1 — Azure Landing Zone**, avec management groups, subscriptions, Azure Policy, tagging, budgets et première implémentation Terraform/AVM.
