@@ -125,3 +125,45 @@ Lab : `labs/lab-13-soutenance`.
 ## Phase suivante — preuves terrain
 
 Exécuter les labs progressivement, renseigner les résultats, mesurer le coût, conserver les erreurs et faire évoluer les ADR. La valeur pédagogique vient désormais de la **preuve par exécution**, pas de l'ajout de nouvelles pages théoriques.
+
+## Phase transversale — industrialisation des labs Azure
+
+Cette phase **ne crée pas une nouvelle itération d'architecture**. Elle industrialise l'exécution des itérations existantes et les principes déjà prévus dans FinOps/GreenOps.
+
+Ordre de réalisation :
+
+1. GitHub Actions comme orchestrateur CI/lifecycle ;
+2. authentification GitHub -> Azure par OIDC sans secret permanent ;
+3. Terraform remote state sur Azure Storage ;
+4. préflight providers, versions, permissions et quotas ;
+5. sizing documenté par environnement ;
+6. estimation horodatée du coût avant tout déploiement payant ;
+7. `terraform plan` + approval ;
+8. CREATE contrôlé ;
+9. exécution des tests et collecte des preuves ;
+10. capture Cost Management / GreenOps ;
+11. DESTROY contrôlé et idempotent ;
+12. TTL/auto-destroy pour les labs éphémères ;
+13. comparaison coût estimé / coût réel et rightsizing.
+
+### Definition of Done d'un lab industrialisé
+
+Un lab payant n'est pas autorisé tant que ne sont pas documentés et vérifiés :
+
+- région et version ;
+- architecture/SKU ;
+- sizing vCPU/RAM/stockage/GPU éventuel ;
+- quotas nécessaires ;
+- prix unitaire actuel ;
+- coût par heure et coût de la fenêtre maximale ;
+- coûts indirects réseau/stockage/logs/private endpoints/backup ;
+- budget et marge de sécurité ;
+- heure `expiry`/TTL ;
+- pipeline CREATE ;
+- pipeline DESTROY ;
+- remote state ;
+- OIDC/IAM/RBAC ;
+- méthode de collecte du coût réel ;
+- vérification finale qu'aucune ressource facturable de lab ne subsiste.
+
+Le dépôt `zdmooc/TradeOps-GenAI-Integration` applique cette phase en premier sur son lab ARO/RHOAI ; son backlog détaillé sert de cas d'usage concret pour industrialiser ensuite les autres labs MayaBank.
