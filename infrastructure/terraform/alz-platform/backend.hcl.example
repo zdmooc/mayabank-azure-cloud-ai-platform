@@ -1,0 +1,5 @@
+resource_group_name  = "rg-mbk-tfstate-prod"
+storage_account_name = "<storage-account-name>"
+container_name       = "tfstate"
+key                  = "platform/alz-platform.tfstate"
+use_azuread_auth     = true
