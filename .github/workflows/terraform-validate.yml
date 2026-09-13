@@ -25,6 +25,7 @@ jobs:
         root:
           - infrastructure/terraform/bootstrap
           - infrastructure/terraform/alz-platform
+          - labs/lab-01-landing-zone/terraform
           - labs/lab-02-identity/terraform
           - labs/lab-03-network/terraform
           - labs/lab-07-data/terraform
