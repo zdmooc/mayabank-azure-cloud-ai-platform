@@ -10,12 +10,14 @@ Ce dépôt démontre le travail d'un Architecte Solution Azure de bout en bout :
 
 Il ne s'agit pas seulement d'une préparation à AZ-305. Chaque décision importante doit être reliée à des exigences, alternatives, risques, ADR, IaC/lab et critères de validation.
 
+Pour une présentation orientée entretien, commencer par [`PORTFOLIO.md`](PORTFOLIO.md).
+
 ## Architecture cible — synthèse
 
 ```mermaid
 flowchart TB
   USERS[Clients / partenaires / employés] --> AFD[Azure Front Door + WAF]
-  AFD --> APIM[API Management - Premium v2 cible isolée]
+  AFD --> APIM[API Management - cible isolée selon besoin]
   APIM --> AKS[AKS Standard - workloads métiers]
   APIM --> PAAS[Functions / Container Apps selon workload]
 
@@ -51,17 +53,31 @@ flowchart TB
 | 2 | Identity & Security | ✅ | ✅ Terraform lab faible coût |
 | 3 | Networking | ✅ | ✅ Terraform Hub-Spoke lab |
 | 4 | AKS | ✅ | 🧪 lab à exécuter à la demande |
-| 5 | API Management | ✅ | 🧪 lab à exécuter à la demande |
-| 6 | Event-driven | ✅ | 🧪 scénario retry/DLQ/idempotence prêt |
+| 5 | API Management | ✅ | ✅ contrat OpenAPI + policy ; déploiement Azure à exécuter |
+| 6 | Event-driven | ✅ | ✅ pattern retry/DLQ/idempotence ; runtime à exécuter |
 | 7 | Data | ✅ | ✅ Terraform Storage lab |
 | 8 | Observability | ✅ | ✅ Terraform Log Analytics lab |
-| 9 | HA / DR | ✅ | 🧪 exercices/runbook prêts |
-| 10 | FinOps / GreenOps | ✅ | 🧪 routine de contrôle prête |
+| 9 | HA / DR | ✅ | ✅ matrice RTO/RPO + runbook ; exercice runtime à exécuter |
+| 10 | FinOps / GreenOps | ✅ | ✅ guardrails + routine de contrôle |
 | 11 | Microsoft Foundry / AI | ✅ | 🧪 RAG lab selon quota |
-| 12 | Migration OpenShift -> Azure | ✅ | 🧪 scénario pilote prêt |
-| 13 | Soutenance Architecte | ✅ | ✅ challenge 30+30 min prêt |
+| 12 | Migration OpenShift -> Azure | ✅ | ✅ matrice ARO/AKS/PaaS + scénario pilote |
+| 13 | Soutenance Architecte | ✅ | ✅ portfolio + challenge entretien |
 
 **Les itérations 0 à 13 sont terminées au niveau conception.** Les labs Azure nécessitant un abonnement authentifié ne sont volontairement pas marqués comme exécutés tant qu'aucun `apply` et aucune preuve de test n'ont été produits.
+
+### Hardening Architecte Azure 2026
+
+Le dépôt a également reçu une passe de finalisation basée sur les références publiques Microsoft actuelles :
+
+- **I1** — Azure Landing Zones + AVM + bootstrap remote state + OIDC : terminé ;
+- **I2** — Identity/Security + Hub-Spoke/Private networking : terminé ;
+- **I3** — AKS enterprise baseline + checklist de preuves : terminé côté conception ;
+- **I4** — architecture paiement APIM + OpenAPI + event-driven/idempotence : terminé côté conception/artefacts ;
+- **I5** — Data + Observability + HA/DR + runbook : terminé côté conception/artefacts ;
+- **I6** — AI Landing Zone + migration OpenShift + FinOps/GreenOps : terminé côté conception ;
+- **I7** — CI, portfolio et soutenance : terminé.
+
+La frontière restante est volontaire : **déploiements Azure et preuves runtime**.
 
 ## Documentation
 
@@ -85,7 +101,7 @@ docs/
 └── 16-soutenance/
 ```
 
-Les décisions structurantes sont centralisées dans `architecture/adr/ADR-CATALOG.md`.
+Les décisions structurantes sont centralisées dans `architecture/adr/ADR-CATALOG.md`. Les procédures opérationnelles sont placées dans `runbooks/`.
 
 ## Labs
 
@@ -99,7 +115,19 @@ Terraform déjà fourni pour les labs les moins coûteux :
 - `lab-07-data` — Storage security baseline ;
 - `lab-08-observability` — Log Analytics baseline.
 
-AKS, APIM Premium v2, multi-région et Microsoft Foundry sont créés uniquement pendant les sessions qui les nécessitent afin d'éviter une facture permanente.
+AKS, APIM, multi-région et Microsoft Foundry sont créés uniquement pendant les sessions qui les nécessitent afin d'éviter une facture permanente.
+
+## Validation CI
+
+`.github/workflows/terraform-validate.yml` vérifie les roots Terraform avec :
+
+```bash
+terraform fmt -check -diff -recursive
+terraform init -backend=false
+terraform validate
+```
+
+La validation statique ne remplace pas un `terraform plan/apply` authentifié ni les tests runtime. Les preuves d'exécution Azure doivent être conservées dans les dossiers `evidence/` des labs concernés.
 
 ## Principes
 
@@ -118,17 +146,20 @@ AKS, APIM Premium v2, multi-région et Microsoft Foundry sont créés uniquement
 ## Références principales
 
 - `Azure/Azure-Landing-Zones`
-- `MicrosoftDocs/architecture-center`
 - `Azure/terraform-azurerm-avm-ptn-alz`
+- `Azure/alz-terraform-accelerator`
+- `MicrosoftDocs/architecture-center`
 - `Azure-Samples/azure-hub-spoke`
 - `Azure/AKS-Landing-Zone-Accelerator`
+- `mspnp/aks-baseline`
 - `Azure/apim-landing-zone-accelerator`
 - `Azure/AI-Landing-Zones`
+- `Azure/DevOps-Landing-Zone`
 
 ## Budget pédagogique
 
-Le dépôt sépare **cible entreprise** et **lab économique**. Azure Firewall, Bastion, APIM Premium v2, AKS multi-zone/multi-région, grosses bases et plateformes IA ne doivent pas rester déployés pour un exercice ponctuel.
+Le dépôt sépare **cible entreprise** et **lab économique**. Azure Firewall, Bastion, APIM à tier élevé, AKS multi-zone/multi-région, grosses bases et plateformes IA ne doivent pas rester déployés pour un exercice ponctuel.
 
 ## Suite pratique
 
-La phase suivante n'est plus d'ajouter des chapitres : elle consiste à **exécuter les labs dans l'ordre**, conserver les preuves, mesurer les coûts et corriger l'architecture à partir des résultats observés.
+La phase suivante n'est plus d'ajouter des chapitres : elle consiste à **exécuter les labs dans l'ordre, conserver les preuves, mesurer les coûts et corriger l'architecture à partir des résultats observés**.
