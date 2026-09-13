@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: MayaBank Payment API
+  version: 1.0.0
+  description: Contract used to demonstrate API governance, idempotence and observability through Azure API Management.
+servers:
+  - url: https://api.mayabank.example/v1
+paths:
+  /payments:
+    post:
+      summary: Submit a payment for asynchronous processing
+      operationId: createPayment
+      parameters:
+        - in: header
+          name: X-Correlation-ID
+          required: false
+          schema:
+            type: string
+            maxLength: 128
+        - in: header
+          name: Idempotency-Key
+          required: true
+          schema:
+            type: string
+            minLength: 8
+            maxLength: 128
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '202':
+          description: Payment accepted for processing
+          headers:
+            X-Correlation-ID:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentAccepted'
+        '400':
+          description: Invalid request
+        '401':
+          description: Authentication required
+        '403':
+          description: Access forbidden
+        '409':
+          description: Idempotency or state conflict
+        '429':
+          description: Rate limit exceeded
+  /payments/{paymentId}:
+    get:
+      summary: Retrieve current payment status
+      operationId: getPayment
+      parameters:
+        - in: path
+          name: paymentId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: header
+          name: X-Correlation-ID
+          required: false
+          schema:
+            type: string
+            maxLength: 128
+      responses:
+        '200':
+          description: Current payment status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentStatus'
+        '404':
+          description: Payment not found
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      required: [debtorAccount, creditorAccount, amount, currency]
+      properties:
+        debtorAccount:
+          type: string
+          minLength: 4
+          maxLength: 64
+        creditorAccount:
+          type: string
+          minLength: 4
+          maxLength: 64
+        amount:
+          type: number
+          format: double
+          exclusiveMinimum: true
+          minimum: 0
+        currency:
+          type: string
+          pattern: '^[A-Z]{3}$'
+          example: EUR
+        remittanceInformation:
+          type: string
+          maxLength: 140
+    PaymentAccepted:
+      type: object
+      required: [paymentId, status]
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ACCEPTED]
+    PaymentStatus:
+      type: object
+      required: [paymentId, status]
+      properties:
+        paymentId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum: [ACCEPTED, PROCESSING, COMPLETED, REJECTED]
+        reasonCode:
+          type: string
+          maxLength: 64
