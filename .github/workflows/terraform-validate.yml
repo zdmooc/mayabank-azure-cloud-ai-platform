@@ -27,6 +27,8 @@ jobs:
           - infrastructure/terraform/alz-platform
           - labs/lab-02-identity/terraform
           - labs/lab-03-network/terraform
+          - labs/lab-07-data/terraform
+          - labs/lab-08-observability/terraform
 
     defaults:
       run:
