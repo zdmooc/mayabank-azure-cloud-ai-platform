@@ -1,0 +1,47 @@
+name: terraform-validate
+
+on:
+  pull_request:
+    paths:
+      - "infrastructure/terraform/**"
+      - ".github/workflows/terraform-validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infrastructure/terraform/**"
+      - ".github/workflows/terraform-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        root:
+          - infrastructure/terraform/bootstrap
+          - infrastructure/terraform/alz-platform
+
+    defaults:
+      run:
+        working-directory: ${{ matrix.root }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.12.2"
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init without backend
+        run: terraform init -backend=false
+
+      - name: Terraform validate
+        run: terraform validate
