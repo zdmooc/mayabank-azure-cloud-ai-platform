@@ -57,16 +57,16 @@ resource "azurerm_user_assigned_identity" "this" {
 }
 
 resource "azurerm_key_vault" "this" {
-  name                        = "kv-mbk-${random_string.suffix.result}"
-  location                    = azurerm_resource_group.this.location
-  resource_group_name         = azurerm_resource_group.this.name
-  tenant_id                   = data.azurerm_client_config.current.tenant_id
-  sku_name                    = "standard"
-  enable_rbac_authorization   = true
-  purge_protection_enabled    = false
-  soft_delete_retention_days  = 7
+  name                          = "kv-mbk-${random_string.suffix.result}"
+  location                      = azurerm_resource_group.this.location
+  resource_group_name           = azurerm_resource_group.this.name
+  tenant_id                     = data.azurerm_client_config.current.tenant_id
+  sku_name                      = "standard"
+  enable_rbac_authorization     = true
+  purge_protection_enabled      = false
+  soft_delete_retention_days    = 7
   public_network_access_enabled = true
-  tags                        = var.tags
+  tags                          = var.tags
 }
 
 resource "azurerm_role_assignment" "identity_secrets_user" {
