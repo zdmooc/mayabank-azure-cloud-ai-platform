@@ -4,11 +4,13 @@ on:
   pull_request:
     paths:
       - "infrastructure/terraform/**"
+      - "labs/**/terraform/**"
       - ".github/workflows/terraform-validate.yml"
   push:
     branches: [main]
     paths:
       - "infrastructure/terraform/**"
+      - "labs/**/terraform/**"
       - ".github/workflows/terraform-validate.yml"
 
 permissions:
@@ -23,6 +25,8 @@ jobs:
         root:
           - infrastructure/terraform/bootstrap
           - infrastructure/terraform/alz-platform
+          - labs/lab-02-identity/terraform
+          - labs/lab-03-network/terraform
 
     defaults:
       run:
